@@ -1,0 +1,82 @@
+// C++ code
+
+//watertank
+char Waterstatus=0;
+//
+
+//ultra
+#define Trig 4
+#define Echo 5
+#define Led 3
+#define Piezo 2
+int PulseWidth;
+int Distance;
+//
+int i=0;
+
+void setup()
+{
+  pinMode(Piezo, OUTPUT);
+  pinMode(Led, OUTPUT);
+  pinMode(Trig, OUTPUT);
+  pinMode(Echo, INPUT);
+  Serial.begin(9600);
+  tone(Piezo, 2000);
+  delay(100);
+  noTone(Piezo);
+  digitalWrite(Trig, HIGH);
+  delay(100);
+  digitalWrite(Trig, LOW);
+  PulseWidth=pulseIn(Echo, HIGH);
+  Distance = (PulseWidth*0.034)/2;
+  
+}
+void Read()
+{
+  digitalWrite(Trig, HIGH);
+  delay(200);
+  digitalWrite(Trig, LOW);
+  PulseWidth=pulseIn(Echo, HIGH);
+  Distance = (PulseWidth*0.034)/2;
+  /*
+  Serial.print("Distance: ");
+  delay(500);
+  Serial.println(Distance);*/
+}
+
+void loop()
+{
+  Read();
+  
+  if(Distance <= 30)
+  {
+  i=0;
+  noTone(Piezo);
+  char Waterstatus[10]=":full ";
+  Serial.write(Waterstatus,7);
+  }
+  
+  else if(Distance > 200)
+  {
+  //i=0;
+  digitalWrite(Led, 1);
+  tone(Piezo, 2400);
+  delay(9);
+  char Waterstatus[10]=":empty";
+  Serial.write(Waterstatus,7);
+  digitalWrite(Led, 0);
+  }
+  
+  else
+  {
+  if(i==0)
+  {
+   tone(Piezo, 2000);
+   delay(10);
+   i++;
+  }
+  noTone(Piezo);
+  char Waterstatus[10]=":ready";
+  Serial.write(Waterstatus,7);
+  }
+}
